@@ -15,6 +15,10 @@ SkeletonSmoother::SkeletonSmoother(ICoordinateMapper *coordinateMapper)
 
 void SkeletonSmoother::updateJointPositions(const unsigned int &bodyIndex, const float &delta, const PointF &screenSize, Joint *joints)
 {
+    if (joints == nullptr || bodyIndex >= BODY_COUNT) {
+        return;
+    }
+
     for (unsigned int jointIndex = 0; jointIndex < JointType_Count; jointIndex++) {
         const PointF jointRawPos = mapBodyPointToScreenPoint(joints[jointIndex].Position, screenSize.X, screenSize.Y);
         //Invert the Y-axis
