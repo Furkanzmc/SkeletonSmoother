@@ -8,7 +8,6 @@ class SkeletonSmoother
 public:
     static const unsigned int DEPTH_WIDTH = 512;
     static const unsigned int DEPTH_HEIGHT = 424;
-    const PointF POINT_ZERO;
 
     struct JointProp {
         JointProp()
@@ -78,6 +77,7 @@ private:
 private:
     PointF mapBodyPointToScreenPoint(const CameraSpacePoint &bodyPoint, const int &width, const int &height);
     bool pointEquals(const PointF &p1, const PointF &p2);
+    PointF pointZero();
 
 };
 

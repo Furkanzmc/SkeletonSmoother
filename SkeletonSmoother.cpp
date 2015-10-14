@@ -2,9 +2,8 @@
 
 SkeletonSmoother::SkeletonSmoother(ICoordinateMapper *coordinateMapper)
     : m_CoordinateMapper(coordinateMapper)
-    , m_SmoothScale(1)
-    , m_PositionScale(1)
-    , POINT_ZERO({0, 0})
+    , m_SmoothScale(1.f)
+    , m_PositionScale(1.f)
 {
     std::fill(m_JointPositions.at(0).begin(), m_JointPositions.at(0).end(), JointProp());
     std::fill(m_JointPositions.at(1).begin(), m_JointPositions.at(1).end(), JointProp());
@@ -18,10 +17,11 @@ void SkeletonSmoother::updateJointPositions(const unsigned int &bodyIndex, const
 {
     for (unsigned int jointIndex = 0; jointIndex < JointType_Count; jointIndex++) {
         const PointF jointRawPos = mapBodyPointToScreenPoint(joints[jointIndex].Position, screenSize.X, screenSize.Y);
+        //Invert the Y-axis
         const PointF screenPos = {jointRawPos.X, screenSize.Y - jointRawPos.Y};
         JointArray &jointPositions = m_JointPositions.at(bodyIndex);
         JointProp &prop = jointPositions.at(jointIndex);
-        if (pointEquals(prop.pos, POINT_ZERO) || prop.isDirty) {
+        if (pointEquals(prop.pos, pointZero()) || prop.isDirty) {
             prop.pos.X = screenPos.X * m_PositionScale;
             prop.pos.Y = screenPos.Y * m_PositionScale;
             prop.isDirty = false;
@@ -113,4 +113,10 @@ PointF SkeletonSmoother::mapBodyPointToScreenPoint(const CameraSpacePoint &bodyP
 bool SkeletonSmoother::pointEquals(const PointF &p1, const PointF &p2)
 {
     return (p1.X == p2.X) && (p1.Y == p2.Y);
+}
+
+PointF SkeletonSmoother::pointZero()
+{
+    PointF p = {0, 0};
+    return p;
 }
