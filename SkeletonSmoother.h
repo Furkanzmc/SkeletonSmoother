@@ -26,8 +26,12 @@ public:
         bool isDraw,
              isDirty;//Set to true if the position needs to be updated
 
-        void updatePos(const float &delta, const float &smoothScale = 1)
+        void updatePos(const float &delta, float smoothScale = 1)
         {
+            auto invalidCheck = [](const PointF & p) -> bool {
+                return (p.X != p.X || p.Y != p.Y);
+            };
+
             velocity.X = (attractionPoint.X - pos.X) * (10 * smoothScale);
             velocity.Y = (attractionPoint.Y - pos.Y) * (10 * smoothScale);
 
@@ -36,6 +40,10 @@ public:
 
             pos.X += velocity.X * delta;
             pos.Y += velocity.Y * delta;
+            //Some joints give -1.#IND, I don't know where it generates from. This fixes that problem by resetting whenever that happens
+            if (invalidCheck(pos)) {
+                reset();
+            }
         }
 
         void reset()
