@@ -19,10 +19,12 @@ public:
             pos = {0, 0};
             attractionPoint = {0, 0};
             drag = {1.5f, 1.5f};
+            spacePoint = {0, 0, 0};
         }
 
         JointType type;
         PointF velocity, pos, attractionPoint, drag;
+        CameraSpacePoint spacePoint;
         bool isDraw,
              isDirty;//Set to true if the position needs to be updated
 
@@ -52,6 +54,7 @@ public:
             pos = {0, 0};
             attractionPoint = {0, 0};
             drag = {1.5f, 1.5f};
+            spacePoint = {0, 0, 0};
         }
     };
     typedef std::array<JointProp, JointType_Count> JointArray;

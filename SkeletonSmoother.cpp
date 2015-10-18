@@ -25,6 +25,7 @@ void SkeletonSmoother::updateJointPositions(const unsigned int &bodyIndex, const
         const PointF screenPos = {jointRawPos.X, screenSize.Y - jointRawPos.Y};
         JointArray &jointPositions = m_JointPositions.at(bodyIndex);
         JointProp &prop = jointPositions.at(jointIndex);
+        prop.spacePoint = joints[jointIndex].Position;
         if (pointEquals(prop.pos, pointZero()) || prop.isDirty) {
             prop.pos.X = screenPos.X * m_PositionScale;
             prop.pos.Y = screenPos.Y * m_PositionScale;
