@@ -1,5 +1,6 @@
 # SkeletonSmoother
-This is a class that reduces the jittering on joint positions when they are drawn onto the screen
+This is a class that reduces the jittering on joint positions when they are drawn onto the screen.
+The coordinate system's origin is the bottom left corner.
 
 # Example with Cocos2dx v3.8.1
 ```C++
