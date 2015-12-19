@@ -3,8 +3,10 @@
 SkeletonSmoother::SkeletonSmoother(ICoordinateMapper *coordinateMapper)
     : m_CoordinateMapper(coordinateMapper)
     , m_SmoothScale(1.f)
-    , m_PositionScale(1.f)
 {
+    m_PositionScale.X = 1.f;
+    m_PositionScale.Y = 1.f;
+
     std::fill(m_JointPositions.at(0).begin(), m_JointPositions.at(0).end(), JointProp());
     std::fill(m_JointPositions.at(1).begin(), m_JointPositions.at(1).end(), JointProp());
     std::fill(m_JointPositions.at(2).begin(), m_JointPositions.at(2).end(), JointProp());
@@ -13,26 +15,24 @@ SkeletonSmoother::SkeletonSmoother(ICoordinateMapper *coordinateMapper)
     std::fill(m_JointPositions.at(5).begin(), m_JointPositions.at(5).end(), JointProp());
 }
 
-void SkeletonSmoother::updateJointPositions(const unsigned int &bodyIndex, const float &delta, const PointF &screenSize, Joint *joints)
+void SkeletonSmoother::updateJointPositions(const unsigned int &bodyIndex, const float &delta, Joint *joints)
 {
     if (joints == nullptr || bodyIndex >= BODY_COUNT) {
         return;
     }
 
     for (unsigned int jointIndex = 0; jointIndex < JointType_Count; jointIndex++) {
-        const PointF jointRawPos = mapBodyPointToScreenPoint(joints[jointIndex].Position, screenSize.X, screenSize.Y);
-        //Invert the Y-axis
-        const PointF screenPos = {jointRawPos.X, screenSize.Y - jointRawPos.Y};
+        const PointF screenPos = mapBodyPointToScreenPoint(joints[jointIndex].Position);
         JointArray &jointPositions = m_JointPositions.at(bodyIndex);
         JointProp &prop = jointPositions.at(jointIndex);
         prop.spacePoint = joints[jointIndex].Position;
         if (pointEquals(prop.pos, pointZero()) || prop.isDirty) {
-            prop.pos.X = screenPos.X * m_PositionScale;
-            prop.pos.Y = screenPos.Y * m_PositionScale;
+            prop.pos.X = screenPos.X * m_PositionScale.X;
+            prop.pos.Y = screenPos.Y * m_PositionScale.Y;
             prop.isDirty = false;
         }
-        prop.attractionPoint.X = screenPos.X * m_PositionScale;
-        prop.attractionPoint.Y = screenPos.Y * m_PositionScale;
+        prop.attractionPoint.X = screenPos.X * m_PositionScale.X;
+        prop.attractionPoint.Y = screenPos.Y * m_PositionScale.Y;
     }
 
     for (unsigned int jointIndex = 0; jointIndex < m_JointPositions.at(bodyIndex).size(); jointIndex++) {
@@ -61,9 +61,9 @@ float SkeletonSmoother::getSmoothScale() const
     return m_SmoothScale;
 }
 
-void SkeletonSmoother::setPositionScale(float scale)
+void SkeletonSmoother::setPositionScale(const PointF &scale)
 {
-    if (scale <= 0) {
+    if (scale.X <= 0 || scale.Y <= 0) {
         return;
     }
 
@@ -75,7 +75,7 @@ void SkeletonSmoother::setPositionScale(float scale)
     }
 }
 
-float SkeletonSmoother::getPositionScale() const
+PointF SkeletonSmoother::getPositionScale() const
 {
     return m_PositionScale;
 }
@@ -100,16 +100,16 @@ bool SkeletonSmoother::isJointDrew(unsigned int bodyIndex, JointType jointType) 
     return m_JointPositions.at(bodyIndex).at(jointType).isDraw;
 }
 
-PointF SkeletonSmoother::mapBodyPointToScreenPoint(const CameraSpacePoint &bodyPoint, const int &width, const int &height)
+PointF SkeletonSmoother::mapBodyPointToScreenPoint(const CameraSpacePoint &bodyPoint)
 {
     // Calculate the body's position on the screen
     PointF screenPos = {0, 0};
-    DepthSpacePoint depthPoint = {0, 0};
+    ColorSpacePoint colorPoint = {0, 0};
 
     if (m_CoordinateMapper) {
-        m_CoordinateMapper->MapCameraPointToDepthSpace(bodyPoint, &depthPoint);
-        screenPos.X = static_cast<float>(depthPoint.X * width) / SkeletonSmoother::DEPTH_WIDTH;
-        screenPos.Y = static_cast<float>(depthPoint.Y * height) / SkeletonSmoother::DEPTH_HEIGHT;
+        m_CoordinateMapper->MapCameraPointToColorSpace(bodyPoint, &colorPoint);
+        screenPos.X = colorPoint.X;
+        screenPos.Y = colorPoint.Y;
     }
 
     return screenPos;

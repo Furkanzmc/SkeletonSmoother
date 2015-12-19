@@ -61,7 +61,7 @@ public:
 
 public:
     SkeletonSmoother(ICoordinateMapper *coordinateMapper);
-    void updateJointPositions(const unsigned int &bodyIndex, const float &delta, const PointF &screenSize, Joint *joints);
+    void updateJointPositions(const unsigned int &bodyIndex, const float &delta, Joint *joints);
     void reset(const unsigned int &bodyIndex);
 
     /**
@@ -71,8 +71,8 @@ public:
     void setSmoothScale(float scale);
     float getSmoothScale() const;
 
-    void setPositionScale(float scale);
-    float getPositionScale() const;
+    void setPositionScale(const PointF &scale);
+    PointF getPositionScale() const;
 
     const std::array<JointProp, JointType_Count> &getJointProperties(const unsigned int &bodyIndex) const;
     PointF getJointPosition(const unsigned int &bodyIndex, const unsigned int &type) const;
@@ -82,11 +82,12 @@ public:
 
 private:
     ICoordinateMapper *m_CoordinateMapper;
-    float m_SmoothScale, m_PositionScale;
+    float m_SmoothScale;
+    PointF m_PositionScale;
     std::array<std::array<JointProp, JointType_Count>, BODY_COUNT> m_JointPositions;
 
 private:
-    PointF mapBodyPointToScreenPoint(const CameraSpacePoint &bodyPoint, const int &width, const int &height);
+    PointF mapBodyPointToScreenPoint(const CameraSpacePoint &bodyPoint);
     bool pointEquals(const PointF &p1, const PointF &p2);
     PointF pointZero();
 
